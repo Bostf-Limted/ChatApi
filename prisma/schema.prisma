@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users{
+  id                String        @unique()
+  lastSeen          DateTime      @default(now())
+
+  sender            Channel[]     @relation("ChannelSender")
+  reveiver          Channel[]     @relation("ChannelReceiver")
+  chats             Chat[]        @relation("ChatSender")
+  groups            Groups[]
+  groupChats        GroupChat[]
+  members           Members[]
+}
+
+model Chat {
+  id                Int           @id @default(autoincrement())
+  message           String
+  userID            Int
+  received          Boolean       @default(false)
+  roomID            Int
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  sender            Users         @relation("ChatSender", fields: [senderID], references: [id])
+  senderID          String
+
+  channel           Channel       @relation("ChatChannel", fields: [channelID], references: [id])
+  channelID         Int
+
+  reply             Chat[]        @relation("reference")
+  referenceID       Int?
+  reference         Chat?         @relation("reference", fields: [referenceID], references: [id])
+}
+
+model Channel {
+  id                Int           @id @default(autoincrement())
+
+  sender            Users         @relation("ChannelSender", fields: [senderID], references: [id])
+  senderID          String
+
+  receiver          Users         @relation("ChannelReceiver", fields: [receiverID], references: [id])
+  receiverID        String
+
+  chats             Chat[]        @relation("ChatChannel")
+}
+
+model Groups {
+  id                Int           @id @default(autoincrement())
+  name              String
+  isPrivate         Boolean       @default(false)
+  lastCommented     DateTime      @default(now())
+  attachment        String?
+
+  creatorID         String
+  creator           Users         @relation(fields: [creatorID], references: [id])
+
+  chats             GroupChat[]
+  members           Members[]
+}
+
+model GroupChat {
+  id                Int           @id @default(autoincrement())
+  message           String
+  userID            String
+
+  groupID           Int
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  user              Users         @relation(fields: [userID], references: [id])
+  group             Groups        @relation(fields: [groupID], references: [id])
+
+  reply             GroupChat[]   @relation("reference")
+  referenceID       Int?
+  reference         GroupChat?    @relation("reference", fields: [referenceID], references: [id])
+}
+
+model Members{
+  user              Users         @relation(fields: [userID], references: [id])  
+  userID            String
+  group             Groups        @relation(fields: [groupID], references: [id])  
+  groupID           Int
+
+  @@id([userID, groupID])
+}
