@@ -10,32 +10,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users{
+model User{
   id                String        @unique()
   lastSeen          DateTime      @default(now())
 
+  organization      Organization  @relation(fields: [organizationID], references: [id])  
+  organizationID    Int
+
   sender            Channel[]     @relation("ChannelSender")
   reveiver          Channel[]     @relation("ChannelReceiver")
-  chats             Chat[]        @relation("ChatSender")
-  groups            Groups[]
-  groupChats        GroupChat[]
-  members           Members[]
+  sentChats         Chat[]
+  createdGroups     Group[]
+  sentGroupChats    GroupChat[]
+  members           Member[]
+  
+  @@id([id, organizationID])
+}
+
+model Organization{
+  id                Int           @id @default(autoincrement())
+  name              String        @default("public")
+
+  users             User[]       
+  groups            Group[]
+  chennels          Channel[]
 }
 
 model Chat {
   id                Int           @id @default(autoincrement())
   message           String
-  userID            Int
   received          Boolean       @default(false)
-  roomID            Int
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  sender            Users         @relation("ChatSender", fields: [senderID], references: [id])
+  sender            User          @relation(fields: [senderID], references: [id])
   senderID          String
 
-  channel           Channel       @relation("ChatChannel", fields: [channelID], references: [id])
-  channelID         Int
+  channel           Channel
 
   reply             Chat[]        @relation("reference")
   referenceID       Int?
@@ -43,18 +54,21 @@ model Chat {
 }
 
 model Channel {
-  id                Int           @id @default(autoincrement())
-
-  sender            Users         @relation("ChannelSender", fields: [senderID], references: [id])
+  sender            User          @relation("ChannelSender", fields: [senderID], references: [id])
   senderID          String
 
-  receiver          Users         @relation("ChannelReceiver", fields: [receiverID], references: [id])
+  receiver          User          @relation("ChannelReceiver", fields: [receiverID], references: [id])
   receiverID        String
 
-  chats             Chat[]        @relation("ChatChannel")
+  organization      Organization  @relation(fields: [organizationID], references: [id])  
+  organizationID    Int
+
+  chats             Chat[]
+
+  @@id([senderID, receiverID])
 }
 
-model Groups {
+model Group {
   id                Int           @id @default(autoincrement())
   name              String
   isPrivate         Boolean       @default(false)
@@ -62,32 +76,38 @@ model Groups {
   attachment        String?
 
   creatorID         String
-  creator           Users         @relation(fields: [creatorID], references: [id])
+  creator           User         @relation(fields: [creatorID], references: [id])
+
+  organizationID    Int
+  organization      Organization  @relation(fields: [organizationID], references: [id])
 
   chats             GroupChat[]
-  members           Members[]
+  members           Member[]
 }
 
 model GroupChat {
   id                Int           @id @default(autoincrement())
   message           String
-  userID            String
 
-  groupID           Int
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
-  user              Users         @relation(fields: [userID], references: [id])
-  group             Groups        @relation(fields: [groupID], references: [id])
+
+  senderID          String
+  sentder           User          @relation(fields: [senderID], references: [id])
+
+  groupID           Int
+  group             Group         @relation(fields: [groupID], references: [id])
 
   reply             GroupChat[]   @relation("reference")
   referenceID       Int?
   reference         GroupChat?    @relation("reference", fields: [referenceID], references: [id])
 }
 
-model Members{
-  user              Users         @relation(fields: [userID], references: [id])  
+model Member{
+  user              User         @relation(fields: [userID], references: [id])
   userID            String
-  group             Groups        @relation(fields: [groupID], references: [id])  
+
+  group             Group        @relation(fields: [groupID], references: [id])  
   groupID           Int
 
   @@id([userID, groupID])
