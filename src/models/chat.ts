@@ -11,3 +11,9 @@ export interface ChatDetails {
 
     reply: ChatDetails[]
 }
+
+class Chat {
+    
+}
+
+export default Chat;

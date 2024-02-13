@@ -12,8 +12,8 @@ datasource db {
 
 model User {
     id                String            @id @unique()
-    name              String?
-    surname           String?
+    name              String
+    surname           String
     email             String?
     username          String?
     phone             String?
@@ -22,8 +22,8 @@ model User {
 
     organization      String?
 
-    user              Channel[]         @relation("ChannelUser")
-    friend            Channel[]         @relation("ChannelFriend")
+    userOne           Channel[]         @relation("UserOne")
+    userTwo           Channel[]         @relation("UserTwo")
     sentChats         Chat[]
     createdGroups     Group[]
     sentGroupChats    GroupChat[]
@@ -51,10 +51,10 @@ model Chat {
 model Channel {
     id                Int               @id @default(autoincrement())
 
-    user              User              @relation("ChannelUser", fields: [userID], references: [id])
+    userOne           User              @relation("UserOne", fields: [userID], references: [id])
     userID            String
 
-    friend            User              @relation("ChannelFriend", fields: [friendID], references: [id])
+    userTwo           User              @relation("UserTwo", fields: [friendID], references: [id])
     friendID          String
 
     organization      String?

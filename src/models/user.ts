@@ -2,12 +2,12 @@ import { HttpStatusCode } from "axios";
 import { DBManager } from "../config";
 import Database from "../config/database";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { env } from "process";
 
 export interface UserDetails{
-
-    name?: string,
-    surname?: string,
+    id: string
+    name: string,
+    surname: string,
+    username?: string
     email?: string,
     phone?: string,
 }
@@ -20,11 +20,11 @@ class User{
 
     async create(token: string): Promise<void>{
         try{
-            const details = jwt.verify(token, env.SECRET || "Bobby", { algorithms: ["RS256"] }) as JwtPayload;
-            await this.database.db.user.upsert({ 
-                where: { id: details.id }, 
+            const { user } = jwt.verify(token, process.env.PRIVATE_ACCESS_TOKEN || "bobby_access" ) as JwtPayload;
+            await this.database.db.user.upsert({
+                where: { id: user.id }, 
                 update: { lastSeen: new Date()  }, 
-                create: { id: details.id, name: details.name, surname: details.surname, email: details.email, phone: details.phone } });
+                create: { id: user.id, name: user.name, surname: user.surname, email: user.email, phone: user.phone } });
         }catch(error){
             this.database.errorHandler.add(HttpStatusCode.InternalServerError, `${error}`, "error encountered when creating user");
         }

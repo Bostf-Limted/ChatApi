@@ -3,8 +3,8 @@ import { UserDetails } from "./user"
 
 export interface ChannelDetails{
     id: number
-    user?: UserDetails
-    friend?: UserDetails
+    userOne: UserDetails
+    userTwo: UserDetails
     organization?: string
     chats: ChatDetails[]
 }
