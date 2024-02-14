@@ -29,6 +29,13 @@ export const toSlurg = (name: string) =>{
     return init.replace(" ", "_");
 }
 
+export function strip<T> (value: T | null): T | undefined{
+    if(value){
+        return value;
+    }
+    return undefined;
+}
+
 export class RouteError extends Error {
     status: HttpStatusCode;
     constructor(status: HttpStatusCode, message: string) {

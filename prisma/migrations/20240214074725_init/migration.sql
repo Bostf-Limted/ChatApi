@@ -1,10 +1,13 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "surname" TEXT NOT NULL,
+    "email" TEXT,
+    "username" TEXT,
+    "phone" TEXT,
     "lastSeen" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "organization" TEXT NOT NULL DEFAULT 'public',
-
-    PRIMARY KEY ("id", "organization")
+    "organization" TEXT
 );
 
 -- CreateTable
@@ -25,11 +28,11 @@ CREATE TABLE "Chat" (
 -- CreateTable
 CREATE TABLE "Channel" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "senderID" TEXT NOT NULL,
-    "receiverID" TEXT NOT NULL,
-    "organization" TEXT NOT NULL DEFAULT 'public',
-    CONSTRAINT "Channel_senderID_fkey" FOREIGN KEY ("senderID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Channel_receiverID_fkey" FOREIGN KEY ("receiverID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "userOneID" TEXT NOT NULL,
+    "userTwoID" TEXT NOT NULL,
+    "organization" TEXT,
+    CONSTRAINT "Channel_userOneID_fkey" FOREIGN KEY ("userOneID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Channel_userTwoID_fkey" FOREIGN KEY ("userTwoID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -40,7 +43,7 @@ CREATE TABLE "Group" (
     "lastCommented" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "attachment" TEXT,
     "creatorID" TEXT NOT NULL,
-    "organization" TEXT NOT NULL DEFAULT 'public',
+    "organization" TEXT,
     CONSTRAINT "Group_creatorID_fkey" FOREIGN KEY ("creatorID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -62,11 +65,27 @@ CREATE TABLE "GroupChat" (
 CREATE TABLE "Member" (
     "userID" TEXT NOT NULL,
     "groupID" INTEGER NOT NULL,
+    "joined" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY ("userID", "groupID"),
     CONSTRAINT "Member_userID_fkey" FOREIGN KEY ("userID") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Member_groupID_fkey" FOREIGN KEY ("groupID") REFERENCES "Group" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- CreateTable
+CREATE TABLE "Delivered" (
+    "userID" TEXT NOT NULL,
+    "groupID" INTEGER NOT NULL,
+    "chatID" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    CONSTRAINT "Delivered_userID_groupID_fkey" FOREIGN KEY ("userID", "groupID") REFERENCES "Member" ("userID", "groupID") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Delivered_chatID_fkey" FOREIGN KEY ("chatID") REFERENCES "GroupChat" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_id_key" ON "User"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Group_name_organization_key" ON "Group"("name", "organization");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Delivered_chatID_key" ON "Delivered"("chatID");

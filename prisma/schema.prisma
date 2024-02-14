@@ -51,11 +51,11 @@ model Chat {
 model Channel {
     id                Int               @id @default(autoincrement())
 
-    userOne           User              @relation("UserOne", fields: [userID], references: [id])
-    userID            String
+    userOne           User              @relation("UserOne", fields: [userOneID], references: [id])
+    userOneID         String
 
-    userTwo           User              @relation("UserTwo", fields: [friendID], references: [id])
-    friendID          String
+    userTwo           User              @relation("UserTwo", fields: [userTwoID], references: [id])
+    userTwoID         String
 
     organization      String?
 
@@ -90,6 +90,8 @@ model GroupChat {
     senderID          String
     sentder           User              @relation(fields: [senderID], references: [id])
 
+    delivered         Delivered[]
+
     groupID           Int
     group             Group             @relation(fields: [groupID], references: [id])
 
@@ -105,5 +107,18 @@ model Member {
     group             Group             @relation(fields: [groupID], references: [id])
     groupID           Int
 
+    joined            DateTime          @default(now())
+
+    delivered         Delivered[]
+
     @@id([userID, groupID])
+}
+
+model Delivered{
+    member            Member            @relation(fields: [userID, groupID], references: [userID, groupID])
+    userID            String
+    groupID           Int
+
+    chat             GroupChat          @relation(fields: [chatID], references: [id])
+    chatID           Int                @id @unique
 }
