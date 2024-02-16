@@ -21,6 +21,7 @@ model User {
     lastSeen          DateTime          @default(now())
 
     organization      String?
+    platform          String
 
     userOne           Channel[]         @relation("UserOne")
     userTwo           Channel[]         @relation("UserTwo")
@@ -28,6 +29,8 @@ model User {
     createdGroups     Group[]
     sentGroupChats    GroupChat[]
     members           Member[]
+
+    @@unique([id, platform, organization])
 }
 
 model Chat {
@@ -58,8 +61,11 @@ model Channel {
     userTwoID         String
 
     organization      String?
+    platform          String
 
     chats             Chat[]
+
+    @@unique([userOneID, userTwoID, organization, platform])
 }
 
 model Group {
@@ -73,11 +79,12 @@ model Group {
     creator           User              @relation(fields: [creatorID], references: [id])
 
     organization      String?
+    platform          String
 
     chats             GroupChat[]
     members           Member[]
 
-    @@unique([name, organization])
+    @@unique([platform, name, organization])
 }
 
 model GroupChat {
@@ -88,7 +95,7 @@ model GroupChat {
     updatedAt         DateTime          @updatedAt
 
     senderID          String
-    sentder           User              @relation(fields: [senderID], references: [id])
+    sender            User              @relation(fields: [senderID], references: [id])
 
     delivered         Delivered[]
 
@@ -108,6 +115,7 @@ model Member {
     groupID           Int
 
     joined            DateTime          @default(now())
+    role              String            @default("member")
 
     delivered         Delivered[]
 

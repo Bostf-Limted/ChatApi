@@ -15,19 +15,21 @@ export interface ChatDetails {
 
     sender: UserDetails
 
-    reply: ChatDetails[]
+    reference?: ChatDetails | null
+    reply?: ChatDetails[]
 }
 
 export interface GroupChatDetails {
-    id: number
-    message: string
-    received : boolean
-    createdAt : Date
-    updatedAt : Date
+    id: number,
+    message: string,
+    createdAt : Date,
+    updatedAt : Date,
 
-    group?: Group
+    sender: UserDetails,
+    group?: Group | null,
 
-    reply: GroupChatDetails[]
+    reference?: GroupChatDetails | null
+    reply?: GroupChatDetails[]
 }
 
 class Chat {
@@ -36,38 +38,139 @@ class Chat {
         this.database = DBManager.instance();
     }
 
-    async create(token: string, data: { chat: { message: string, receiver?: string, group?: string}, organization?: string }): Promise<ChatDetails | GroupChatDetails | undefined>{
+    async create(platform: string, token: string, data: { chat: { message: string, receiverID?: string, groupID?: number}, organization?: string }): Promise<ChatDetails | GroupChatDetails | undefined>{
         try{
             const { user } = jwt.verify(token, process.env.PRIVATE_ACCESS_TOKEN || "bobby_access" ) as JwtPayload;
-
-            if(data.chat.group){
-                const group = await this.database.db.group.findFirst({ where: { name: data.chat.group, organization: data.organization } });
-                if(group){
-                    const chat = await this.database.db.groupChat.create({ data: { senderID: user.id, message: data.chat.message, groupID: group.id } });
-
-                    return { ...chat, reply: [] };
-                }
+            if(data.chat.groupID){
+                const chat = await this.database.db.groupChat.create({ 
+                    data: { senderID: user.id, message: data.chat.message, groupID: data.chat.groupID },
+                    include: {
+                        sender: true,
+                        reply: { include: { sender: true } },
+                    }
+                });
+                return chat;
             }
 
-            if(data.chat.receiver){
+            if(data.chat.receiverID){
                 let channel = await this.database.db.channel.findFirst({
                     where: { 
-                        OR: [ { userOneID: user.id, userTwoID: data.chat.receiver }, { userOneID: data.chat.receiver, userTwoID: user.id } ], 
-                        organization: data.organization
+                        OR: [ { userOneID: user.id, userTwoID: data.chat.receiverID }, { userOneID: data.chat.receiverID, userTwoID: user.id } ], 
+                        organization: data.organization, platform
                     }
                 });
 
                 if(!channel){
-                    channel = await this.database.db.channel.create({ data: { userOneID: user.id, userTwoID: data.chat.receiver, organization: data.organization } });
+                    channel = await this.database.db.channel.create({ data: { platform, userOneID: user.id, userTwoID: data.chat.receiverID, organization: data.organization } });
                 }
 
                 const chat = await this.database.db.chat.create({
                     data: { message: data.chat.message, senderID: user.id, channelID: channel.id },
-                    include: {  }
+                    include: { sender: true, reply: { include: { sender: true } } }
                 });
 
-                return { ...chat, reply: [] };
+                return chat;
             }
+        }catch(error){
+            if(error instanceof jwt.TokenExpiredError){
+                this.database.errorHandler.add(HttpStatusCode.Unauthorized, `${error}`, "session expired, try logging in");
+            }else{
+                this.database.errorHandler.add(HttpStatusCode.InternalServerError, `${error}`, "error encountered when creating user");
+            }
+        }
+    }
+
+    async reply(token: string, data: { chat: { message: string, chatID: number, channelID?: number, groupID?: number}, organization?: string }): Promise<ChatDetails | GroupChatDetails | undefined>{
+        try{
+            const { user } = jwt.verify(token, process.env.PRIVATE_ACCESS_TOKEN || "bobby_access" ) as JwtPayload;
+
+            if(data.chat.groupID){
+                const chat = await this.database.db.groupChat.create({ 
+                    data: { senderID: user.id, message: data.chat.message, groupID: data.chat.groupID, referenceID: data.chat.chatID },
+                    include: {
+                        sender: true,
+                        reply: { include: { sender: true } },
+                        reference: { include: { sender:  true } }
+                    }
+                });
+                return chat;
+            }
+
+
+            if(data.chat.channelID){
+                const chat = await this.database.db.chat.create({
+                    data: { message: data.chat.message, senderID: user.id, channelID: data.chat.channelID, referenceID: data.chat.chatID },
+                    include: {
+                        sender: true,
+                        reply: { include: { sender: true } },
+                        reference: { include: { sender:  true } }
+                    }
+                });
+                return chat;
+            }
+        }catch(error){
+            if(error instanceof jwt.TokenExpiredError){
+                this.database.errorHandler.add(HttpStatusCode.Unauthorized, `${error}`, "session expired, try logging in");
+            }else{
+                this.database.errorHandler.add(HttpStatusCode.InternalServerError, `${error}`, "error encountered when replying to chat");
+            }
+        }
+    }
+
+    async update(token: string, data: { chat: { message: string, chatID: number, channelID?: number, groupID?: number}, organization?: string }): Promise<ChatDetails | GroupChatDetails | undefined>{
+        try{
+            const { user } = jwt.verify(token, process.env.PRIVATE_ACCESS_TOKEN || "bobby_access" ) as JwtPayload;
+
+            if(data.chat.groupID){
+                const chat = await this.database.db.groupChat.update({ 
+                    where: { id: data.chat.chatID, senderID: user.id, groupID: data.chat.groupID, },
+                    data: { message: data.chat.message },
+                    include: {
+                        sender: true,
+                        reply: { include: { sender: true } },
+                        reference: { include: { sender:  true } }
+                    }
+                });
+                return chat;
+            }
+
+            if(data.chat.channelID){
+                const chat = await this.database.db.chat.update({
+                    where: { id: data.chat.chatID, senderID: user.id, channelID: data.chat.channelID,  },
+                    data: { message: data.chat.message },
+                    include: {
+                        sender: true,
+                        reply: { include: { sender: true } },
+                        reference: { include: { sender:  true } }
+                    }
+                });
+                return chat;
+            }
+        }catch(error){
+            if(error instanceof jwt.TokenExpiredError){
+                this.database.errorHandler.add(HttpStatusCode.Unauthorized, `${error}`, "session expired, try logging in");
+            }else{
+                this.database.errorHandler.add(HttpStatusCode.InternalServerError, `${error}`, "error encountered when updating chat");
+            }
+        }
+    }
+
+    async delete(token: string, data: { chatID: number, channelID?: number, groupID?: number }): Promise<string| undefined>{
+        try{
+            const { user } = jwt.verify(token, process.env.PRIVATE_ACCESS_TOKEN || "bobby_access" ) as JwtPayload;
+
+            if(data.groupID){
+                await this.database.db.groupChat.delete({
+                    where: { id: data.chatID,  senderID: user.id, groupID: data.groupID }
+                });
+            }
+
+            if(data.channelID){
+                await this.database.db.chat.delete({
+                    where: { channelID: data.channelID, id: data.chatID, senderID: user.id, },
+                });
+            }
+            return "chat deleting sucessful";
         }catch(error){
             if(error instanceof jwt.TokenExpiredError){
                 this.database.errorHandler.add(HttpStatusCode.Unauthorized, `${error}`, "session expired, try logging in");
