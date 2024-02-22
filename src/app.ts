@@ -3,16 +3,12 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import express, { Request, Response, NextFunction } from "express";
 import logger from 'jet-logger';
-import path from 'path';
 import 'express-async-errors';
-import vhost from "vhost";
-
-import HttpStatusCodes from "./constants/HttpStatusCodes";
 
 import { RouteError } from "./utils";
 import morgan from "morgan";
-import blimitedRouter from "./blimited/routes";
-import academiaRouter from "./academia/routes";
+import { HttpStatusCode } from "axios";
+import routes from "./routes";
 
 const api = express();
 
@@ -50,30 +46,13 @@ api.use(( err: Error, _: Request, res: Response, next: NextFunction,) => {
         logger.err(err, true);
     }
 
-    let status = HttpStatusCodes.BAD_REQUEST;
+    let status = HttpStatusCode.BadGateway;
     if (err instanceof RouteError) {
         status = err.status;
     }
     return res.status(status).json({ error: err.message });
 });
 
+api.use(routes);
 
-api.use("/res", express.static(path.resolve(__dirname, 'public'))); 
-api.use("/", blimitedRouter);
-api.use("/academia", academiaRouter);
-
-/*app.listen(process.env.PORT, () => {
-    console.log(`Node server started running at post: ${process.env.PORT}`);
-});*/
-
-const app = express();
-
-// Use vhost middleware
-app.use(vhost(/^api\..*/, api)); // API Subdomain
-// Main Domain (Frontend)
-app.use(express.static(path.join(__dirname, 'website')));
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, 'website/index.html'));
-});
-
-export default app;
+export default api;

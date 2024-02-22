@@ -1,0 +1,166 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    display: flex;
+    width: 100dvw;
+    height: 100dvh;
+    padding: 0%;
+    flex-direction: column;
+    align-items: stretch;
+    background-color: whitesmoke;
+}
+
+a{
+    text-decoration: none;
+}
+
+:root{
+    --primary: #3867ff;
+    --dark: #404E66;
+    --tab-width: 300px;
+}
+
+.header{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    box-shadow: lightgray 1px 3px 6px;
+}
+
+.header > .title-container > .title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.header > .title-container{
+    display: flex;
+    align-items: center;
+    width: var(--tab-width);
+    background-color: #2D405F;
+    padding: 16px;
+    justify-content: space-between;
+}
+
+.header > .title-container > .title > span{
+    font-size: 26px;
+}
+
+.header > .option{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.expand-button{
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transform: rotateZ(90deg);
+}
+
+.main{
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.tab{
+    width: 300px;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    background-color: var(--dark);
+}
+
+.tab-options{
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.tab-options-title{
+    color: white;
+    font-size: 18px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 12px;
+    padding-top: 15px;
+    padding-bottom: 12px;
+}
+
+.tab-item{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    flex-direction: row;
+    font-size: 15px;
+    font-weight: 600;
+    color: gray;
+    border-left: solid 3px transparent;
+    &:hover{
+        color: #3867ff;
+    }
+}
+
+.tab-item > a{
+    color: gray;
+    &:hover{
+        color: #3867ff;
+    }
+}
+
+.tab-item > span{
+    font-size: 22px;
+}
+
+.active{
+    color: white;
+    border-left: solid 3px white;
+}
+
+.active > a{
+    color: white;
+}
+
+.content{
+    flex: 1;
+    height: 100%;
+}
+
+.center{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.footer{
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: black;
+    top: 0px;
+    left: 0px;
+}

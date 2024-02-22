@@ -29,6 +29,8 @@ model User {
     createdGroups     Group[]
     sentGroupChats    GroupChat[]
     members           Member[]
+    notifications     Notification[]    @relation("notification")
+    sentNotification  Notification[]   @relation("NotificationSender")
 
     @@unique([id, platform, organization])
 }
@@ -40,25 +42,27 @@ model Chat {
     createdAt         DateTime          @default(now())
     updatedAt         DateTime          @updatedAt
 
-    sender            User              @relation(fields: [senderID], references: [id])
+    sender            User              @relation(fields: [senderID], references: [id], onDelete: Cascade)
     senderID          String
 
-    channel           Channel           @relation(fields: [channelID], references: [id])
+    channel           Channel           @relation(fields: [channelID], references: [id], onDelete: Cascade)
     channelID         Int
 
     reply             Chat[]            @relation("reference")
     referenceID       Int?
-    reference         Chat?             @relation("reference", fields: [referenceID], references: [id])
+    reference         Chat?             @relation("reference", fields: [referenceID], references: [id], onDelete: SetNull)
 }
 
 model Channel {
     id                Int               @id @default(autoincrement())
 
-    userOne           User              @relation("UserOne", fields: [userOneID], references: [id])
+    userOne           User              @relation("UserOne", fields: [userOneID], references: [id], onDelete: Cascade)
     userOneID         String
 
-    userTwo           User              @relation("UserTwo", fields: [userTwoID], references: [id])
+    userTwo           User              @relation("UserTwo", fields: [userTwoID], references: [id], onDelete: Cascade)
     userTwoID         String
+
+    lastCommunicated  DateTime          @default(now())
 
     organization      String?
     platform          String
@@ -71,18 +75,18 @@ model Channel {
 model Group {
     id                Int               @id @default(autoincrement())
     name              String
-    isPrivate         Boolean           @default(false)
-    lastCommented     DateTime          @default(now())
+    lastCommunicated  DateTime          @default(now())
     attachment        String?
 
     creatorID         String
-    creator           User              @relation(fields: [creatorID], references: [id])
+    creator           User              @relation(fields: [creatorID], references: [id], onDelete: NoAction)
 
     organization      String?
     platform          String
 
     chats             GroupChat[]
     members           Member[]
+    notifications Notification[]   @relation("GroupNotification")
 
     @@unique([platform, name, organization])
 }
@@ -95,23 +99,23 @@ model GroupChat {
     updatedAt         DateTime          @updatedAt
 
     senderID          String
-    sender            User              @relation(fields: [senderID], references: [id])
+    sender            User              @relation(fields: [senderID], references: [id], onDelete: Cascade)
 
     delivered         Delivered[]
 
     groupID           Int
-    group             Group             @relation(fields: [groupID], references: [id])
+    group             Group             @relation(fields: [groupID], references: [id], onDelete: Cascade)
 
     reply             GroupChat[]       @relation("reference")
     referenceID       Int?
-    reference         GroupChat?        @relation("reference", fields: [referenceID], references: [id])
+    reference         GroupChat?        @relation("reference", fields: [referenceID], references: [id], onDelete: SetNull)
 }
 
 model Member {
-    user              User              @relation(fields: [userID], references: [id])
+    user              User              @relation(fields: [userID], references: [id], onDelete: Cascade)
     userID            String
 
-    group             Group             @relation(fields: [groupID], references: [id])
+    group             Group             @relation(fields: [groupID], references: [id], onDelete: Cascade)
     groupID           Int
 
     joined            DateTime          @default(now())
@@ -123,10 +127,30 @@ model Member {
 }
 
 model Delivered{
-    member            Member            @relation(fields: [userID, groupID], references: [userID, groupID])
+    member            Member            @relation(fields: [userID, groupID], references: [userID, groupID], onDelete: Cascade)
+
     userID            String
     groupID           Int
 
-    chat             GroupChat          @relation(fields: [chatID], references: [id])
+    chat             GroupChat          @relation(fields: [chatID], references: [id], onDelete: Cascade)
     chatID           Int                @id @unique
+}
+
+model Notification{
+    id                Int               @id @default(autoincrement())
+    message           String?
+    alert             String  
+    created           DateTime          @default(now())
+    received          Boolean           @default(false)
+    platform          String
+    organization      String?
+
+    senderID          String?
+    sender            User?             @relation("NotificationSender", fields: [senderID], references: [id], onDelete: SetNull)
+
+    groupID           Int?
+    group             Group?            @relation("GroupNotification", fields: [groupID], references: [id], onDelete: SetNull)
+
+    reciecver         User              @relation("notification", fields: [recieverID], references: [id], onDelete: Cascade)
+    recieverID        String  
 }
