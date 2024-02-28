@@ -1,0 +1,92 @@
+@mixin feature-paragraph{
+    padding: 10px;
+    width: 300px;
+    margin-top: 30px;
+    font-weight: 300;
+    font-size: 16px;
+    border-radius: 30px;
+    border: solid 2px;
+    border-color: var(--dark);
+}
+
+.features{
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.features > * {
+    flex: 1;
+}
+
+.feature-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-image{
+    width: 700px;
+}
+
+.feature-contents{
+    display: flex;
+    justify-content: center;
+}
+
+.feature-line{
+    width: 2px;
+    height: 420px;
+    z-index: -20;
+    background-color: var(--dark);
+}
+
+.feature-item-circle{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    border: solid 2px;
+    background-color: whitesmoke;
+    border-color: var(--dark);
+    color: var(--dark);
+    font-size: 30px;
+}
+
+.feature-item-left{
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 12px;
+    margin-right: -32px;
+    margin-bottom: 30px;
+}
+
+.feature-item-right{
+    display: flex;
+    gap: 12px;
+    margin-left: -32px;
+    margin-bottom: 30px;
+}
+
+.feature-item-left > p{
+    @include feature-paragraph;
+    border-top-right-radius: 0px;
+}
+
+.feature-item-right > p{
+    @include feature-paragraph;
+    border-top-left-radius: 0px;
+}
+
+.feature-item-right-padding{
+    padding-top: 130px;
+}
+
+.feature-item-left-padding{
+    padding-top: 20px;
+}

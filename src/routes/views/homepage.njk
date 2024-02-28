@@ -1,0 +1,18 @@
+{% extends "__index.njk" %}
+
+{% block innerHead %}
+    <link rel="stylesheet" href="/assets/css/features.css" />
+    <link rel="stylesheet" href="/assets/css/footer.css" />
+{% endblock innerHead %}
+
+{% block content %}
+    <section id="about">
+        {% include "components/__about.njk" %}
+    </section>
+    <section id="features">
+        {% include "components/__features.njk" %}
+    </section>
+    <section id="contacts">
+        {% include "components/__footer.njk" %}
+    </section>
+{% endblock content %}

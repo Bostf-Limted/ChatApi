@@ -1,0 +1,82 @@
+:root{
+    --primary: #3867ff;
+    --secondary: #f4511e;
+    --dark: #404E66;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a{
+    text-decoration: none;
+    :visited{
+        text-decoration: none;
+    }
+}
+
+@mixin text-custom($color){
+    color: $color !important;
+}
+  
+@mixin bg-custom($color){
+	background-color: $color !important;
+}
+  
+@mixin border($color, $thickness){
+    border-style: solid !important; 
+    border-color: $color !important;
+    border-width: $thickness !important;
+}
+  
+@mixin border-primary($thickness){
+    @include border( $primary, $thickness);
+}
+  
+@mixin btn($color, $hoverColor, $textColor, $textHover){
+    @include border( $color, 2px);
+    background-color: $color;
+	color: $textColor;
+	&:hover{
+        @include border( $hoverColor, 2px);
+        background-color: $hoverColor;
+        color: $textHover;
+	}
+}
+  
+@mixin outline($color){
+    background-color: transparent;
+	@include border( $color, 2px);
+    color: $color;
+}
+  
+@mixin btn-outline($color){
+	@include outline($color);
+    cursor: pointer;
+	&:hover{
+	  background-color: $color;
+	  color: gray;
+	}
+}
+
+@mixin padding-horizontal($value){
+    padding-left: $value;
+    padding-right: $value;
+}
+
+@mixin padding-vertical($value){
+    padding-top: $value;
+    padding-bottom: $value;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+

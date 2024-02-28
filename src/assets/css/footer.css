@@ -1,0 +1,69 @@
+:root {
+  --primary: #3867ff;
+  --secondary: #f4511e;
+  --dark: #404E66;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+a :visited {
+  text-decoration: none;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+table {
+  width: 100%;
+}
+
+td, th {
+  padding-bottom: 10px;
+}
+
+.footer-container {
+  width: 100%;
+}
+
+.footer-container-top {
+  display: flex;
+  width: 100%;
+}
+
+.footer-company-name {
+  margin-top: 20px;
+}
+
+.footer-company-name > a {
+  color: white;
+}
+
+td, .footer-company-name {
+  font-size: 16px;
+}
+
+th {
+  font-size: 18px;
+  text-align: start;
+}
+
+td > a {
+  color: white;
+}
+
+td > span, th > span {
+  font-size: 22px;
+}
+
+/*# sourceMappingURL=footer.css.map */

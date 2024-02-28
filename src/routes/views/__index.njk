@@ -1,0 +1,49 @@
+{% extends "__base.njk" %}
+
+{% block head %}
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/features.css" />
+    <link rel="stylesheet" href="/assets/css/footer.css" />
+    {% block innerHead %}{% endblock innerHead %}
+{% endblock head %}
+
+{% block body %}
+    <div x-data="{ isScrolled: false }" x-on:scroll.window="isScrolled = window.scrollY > 0">
+        <header :class="isScrolled ? 'header-light' : 'header-transparent'">
+            <h3 class="title"><span class="cbi--iris-group"></span> {{title}}</h3>
+            <div class="options">
+                <a href="#" @click.prevent="scrollToSection('about')" class="options-about active">About</a>
+                <a href="#" @click.prevent="scrollToSection('features')" class="options-features">Features</a>
+                <a href="/docs">Docs</a>
+                <a href="#" @click.prevent="scrollToSection('contacts')" class="options-contacts">Contacts</a>
+            </div>
+            {% if user %}
+
+            {% else %}
+                <a href="/signin">Sign In</a>
+            {% endif %}
+        </header>
+        {% block content %}{% endblock content %}
+    </div>
+    <script>
+        let sections = document.querySelectorAll("section");
+        let current = "about";
+        
+        const scrollToSection = (section) => {
+            //this.activeSection = section;
+            const targetSection = document.getElementById(section);
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.addEventListener("scroll", () => {
+            document.querySelectorAll(`.options-${current}`)[0].classList.remove("active");
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                if (this.scrollY >= sectionTop - 60) {
+                    current = section.id;
+                }
+            });
+            document.querySelectorAll(`.options-${current}`)[0].classList.add("active");
+		});
+    </script>
+{% endblock body %}

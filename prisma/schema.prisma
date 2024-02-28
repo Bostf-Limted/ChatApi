@@ -10,6 +10,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Developer{
+    id                String            @id @unique()
+    name              String
+    surname           String
+    email             String
+    phone             String
+
+    projects          Project[]
+}
+
+model Project{
+    id                Int              @id @default(autoincrement())
+    name              String
+    
+    jwtAccessName     String
+    jwtAccessKey      String
+
+    developerID       String
+    developer         Developer        @relation(fields: [developerID], references: [id], onDelete: Cascade)
+
+    keys              AccessKey[]
+    users             User[]
+    groups            Group[]
+    channels          Channel[]
+    notifications     Notification[]
+
+    @@unique([name, developerID])
+}
+
+model AccessKey{
+    key               String            @id @unique
+    enabled           Boolean           @default(false)
+
+    projectID         Int
+    project           Project           @relation(fields: [projectID], references: [id], onDelete: Cascade)
+
+    @@unique([key, projectID])
+}
+
 model User {
     id                String            @id @unique()
     name              String
@@ -21,7 +60,9 @@ model User {
     lastSeen          DateTime          @default(now())
 
     organization      String?
-    platform          String
+    
+    projectID         Int
+    project           Project            @relation(fields: [projectID], references: [id], onDelete: Cascade)
 
     userOne           Channel[]         @relation("UserOne")
     userTwo           Channel[]         @relation("UserTwo")
@@ -32,7 +73,7 @@ model User {
     notifications     Notification[]    @relation("notification")
     sentNotification  Notification[]   @relation("NotificationSender")
 
-    @@unique([id, platform, organization])
+    @@unique([id, projectID, organization])
 }
 
 model Chat {
@@ -65,11 +106,13 @@ model Channel {
     lastCommunicated  DateTime          @default(now())
 
     organization      String?
-    platform          String
+    
+    projectID         Int
+    project           Project            @relation(fields: [projectID], references: [id])
 
     chats             Chat[]
 
-    @@unique([userOneID, userTwoID, organization, platform])
+    @@unique([userOneID, userTwoID, organization, projectID])
 }
 
 model Group {
@@ -82,13 +125,15 @@ model Group {
     creator           User              @relation(fields: [creatorID], references: [id], onDelete: NoAction)
 
     organization      String?
-    platform          String
+
+    projectID         Int
+    project           Project            @relation(fields: [projectID], references: [id])
 
     chats             GroupChat[]
     members           Member[]
     notifications Notification[]   @relation("GroupNotification")
 
-    @@unique([platform, name, organization])
+    @@unique([projectID, name, organization])
 }
 
 model GroupChat {
@@ -142,7 +187,6 @@ model Notification{
     alert             String  
     created           DateTime          @default(now())
     received          Boolean           @default(false)
-    platform          String
     organization      String?
 
     senderID          String?
@@ -152,5 +196,8 @@ model Notification{
     group             Group?            @relation("GroupNotification", fields: [groupID], references: [id], onDelete: SetNull)
 
     reciecver         User              @relation("notification", fields: [recieverID], references: [id], onDelete: Cascade)
-    recieverID        String  
+    recieverID        String
+
+    projectID         Int
+    project           Project           @relation(fields: [projectID], references: [id])  
 }
