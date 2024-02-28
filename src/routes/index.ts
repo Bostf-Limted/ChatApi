@@ -7,6 +7,7 @@ import { HttpStatusCode } from "axios";
 import chatApi from "./chat-api";
 import jwt from "jsonwebtoken";
 import jetLogger from "jet-logger";
+import api from "./api";
 
 const routes = express();
 
@@ -63,8 +64,8 @@ const APIAuthenication = async (req: Request, res: Response, next: NextFunction)
     return res.status(HttpStatusCode.Unauthorized).send({message: "access token expired, try refreshing or login again"});
 };
 
-routes.use("/api", APIAuthenication, chatApi);
-routes.use("/auth", chatAPIAuthenication, chatApi);
+routes.use("/auth", APIAuthenication, api);
+routes.use("/api", chatAPIAuthenication, chatApi);
 routes.use("/assets", express.static(path.resolve(__dirname, "../assets")));
 
 nunjucks.configure(path.resolve(__dirname, "views"), {
