@@ -36,26 +36,6 @@
                     <button x-on:click="$store.user.signup(name, surname, email, password, repassword)" type="button" class='options-btn btn-white'>Submit</button>
                 </form>
             </div>
-            <div x-show="$store.user.value && !$store.user.loading" class="forms" style="display: none;">
-                <img src="/assets/images/profile.png"  width="150px" style="background-color: white; border-radius: 50%;" />
-                <table style="margin-top: 20px;">
-                    <tr>
-                        <td>Name</td>
-                        <td x-text="$store.user.value?.name"></td>
-                    </tr>
-                    <tr>
-                        <td>Surname</td>
-                        <td x-text="$store.user.value?.surname"></td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td x-text="$store.user.value?.email"></td>
-                    </tr>
-                </table>
-                <div style="margin-top: 20px; display: flex; width: 100%;  justify-content: right;">
-                    <button style="width: 120px;" x-on:click="$store.user.logout();" class="btn-white options-btn">Logout</button>
-                </div>
-            </div>
             <div x-show="$store.user.loading" class="forms" style="display: none;">
                 {% include "components/__loading.njk" %}
             </div>
@@ -70,7 +50,7 @@
                     login(email, password){
                         this.loading = true;
                         const details = { email: email, password: password };
-                            const options = { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(details), };
+                        const options = { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify(details), };
                         fetch("/api/user/login", options).then(response => response.json()).then(data =>{
                             this.loading = false;
                             console.log(data);

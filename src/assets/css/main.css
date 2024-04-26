@@ -106,13 +106,22 @@ section {
   width: 100dvw;
 }
 
-#about {
+#about, #signin {
   background-image: url("/assets/images/igor-miske-JVSgcV8_vb4-unsplash.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
   padding-left: 0px;
   padding-right: 0px;
+}
+
+.signin-container {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  height: 100dvh;
+  padding-top: 160px;
 }
 
 .about-container {

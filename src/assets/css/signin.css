@@ -1,14 +1,3 @@
-body {
-  background-image: url("/assets/images/marvin-meyer-SYTO3xs06fU-unsplash.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-#signin {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
 .row {
   display: flex;
 }
@@ -117,15 +106,11 @@ body {
   border: solid 2px whitesmoke;
 }
 
-.content {
-  margin-top: 80px;
-}
-
 .forms {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 500px;
+  width: 550px;
   padding: 30px;
   background-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
@@ -157,6 +142,7 @@ form > input {
   font-size: 0.8em;
   border: solid white 0px;
   border-radius: 20px;
+  outline: none;
 }
 
 form > input:active {
@@ -171,40 +157,6 @@ form > input:active {
   font-weight: 500;
   text-align: center;
   border-radius: 20px;
-}
-
-.content-container {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-.content-btn {
-  padding: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  border-radius: 20px;
-  margin: 10px;
-}
-
-.content-header {
-  letter-spacing: 1.2;
-  font-size: 2.2em;
-  color: whitesmoke;
-  font-weight: 800;
-  margin: 10px;
-}
-
-.content-item {
-  font-size: 18px;
-  color: whitesmoke;
-  letter-spacing: 1.2;
-  font-weight: 400;
-  margin: 10px;
-}
-
-.content-image {
-  width: 620px;
 }
 
 /*# sourceMappingURL=signin.css.map */

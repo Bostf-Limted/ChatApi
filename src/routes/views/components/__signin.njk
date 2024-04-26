@@ -1,0 +1,32 @@
+<section id="signin">
+    <div class="signin-container">
+        <div class='text-center' x-data="{ login: true, name: '', surname: '', email: '', password: '', repassword, loginEmail: '', loginPassowrd:'' }">
+            <div class='forms'>
+                <div class='row' style='margin-bottom: 30px;'>
+                    <div class='col-5 pe-1'><button x-on:click='login = true' x-bind:class='login ? "btn-white options-btn" : "btn-outline-white options-btn"'>Login</button></div>
+                    <div class='col-5 ps-1'><button x-on:click='login = false' x-bind:class='!login ? "btn-white options-btn" : "btn-outline-white options-btn"'>Sign Up</button></div>
+                </div>
+                <form x-show='login' class="slidin">
+                    <label for='email'>Email:</label><br>
+                    <input x-model="loginEmail" type='email' id='loginEmail' name='email'><br>
+                    <label for='password'>Password:</label><br>
+                    <input x-model="loginPassowrd" type='password' id='loginPassowrd' name='password'>
+                    <button id="loginBtn" type="button" class='options-btn btn-white'>Login</button>
+                </form>
+                <form x-show='!login' class="slidin" style="display:none">
+                    <label for='name'>Name:</label><br>
+                    <input x-model="name" type='text' id='name' name='name' required><br>
+                    <label for='surname'>Surname:</label><br>
+                    <input x-model="surname" type='text' id='surname' name='surname' required><br>
+                    <label for='email'>Email:</label><br>
+                    <input x-model="email" type='email' id='email' name='email' required><br>
+                    <label for='password'>Password:</label><br>
+                    <input x-model="password" type='password' id='password' name='password' required>
+                    <label for='repassword'>Renter Password:</label><br>
+                    <input x-model="repassword" type='password' id='repassword' name='repassword' required>
+                    <button type="button" class='options-btn btn-white'>Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
